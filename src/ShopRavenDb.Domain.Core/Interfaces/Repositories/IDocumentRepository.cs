@@ -2,5 +2,5 @@
 
 public interface IDocumentRepository
 {
-    
+    Task<string> AttachDocument(string version, string description, IEnumerable<Build> builds, IFormFile file);
 }

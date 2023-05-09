@@ -1,4 +1,4 @@
-﻿namespace Shop.Infrastructure.CrossCutting.Ioc
+﻿namespace ShopRavenDb.Infrastructure.CrossCutting.Ioc
 {
     public static class ServicesCollectionExtensions
     {
@@ -8,7 +8,7 @@
             {
                 var store = new DocumentStore
                 {
-                    Urls = new string[] { "http://127.0.0.1:8080/" },
+                    Urls = new string[] {"http://127.0.0.1:8080/"},
                     Database = "Shop"
                 };
 
@@ -26,6 +26,8 @@
             {
                 mc.AddProfile(new DtoToModelMappingCustomer());
                 mc.AddProfile(new DtoToModelMappingAddress());
+                mc.AddProfile(new DtoToModelMappingVersioningFile());
+                mc.AddProfile(new DtoToModelMappingBuild());
             });
 
             IMapper mapper = mappingConfig.CreateMapper();
@@ -37,21 +39,21 @@
         public static IServiceCollection AddDomainServices(this IServiceCollection servicesCollection)
         {
             servicesCollection.TryAddScoped<ICustomerService, CustomerService>();
-
+            servicesCollection.TryAddScoped<IDocumentService, DocumentService>();
             return servicesCollection;
         }
 
         public static IServiceCollection AddApplicationServices(this IServiceCollection servicesCollection)
         {
             servicesCollection.TryAddScoped<ICustomerApplication, CustomerApplication>();
-
+            servicesCollection.TryAddScoped<IDocumentApplication, DocumentApplication>();
             return servicesCollection;
         }
 
         public static IServiceCollection AddRepositories(this IServiceCollection servicesCollection)
         {
             servicesCollection.TryAddSingleton<ICustomerRepository, CustomerRepository>();
-
+            servicesCollection.TryAddScoped<IDocumentRepository, DocumentRepository>();
             return servicesCollection;
         }
     }
