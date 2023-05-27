@@ -2,5 +2,6 @@
 
 public interface IDocumentService
 {
-    Task<string> AttachDocument(string version, string description, IEnumerable<Build> builds, IFormFile file);
+    Task<string> AttachDocument(IFormFile file);
+    Task<AttachmentResult?> GetAttachDocument(string documentId);
 }

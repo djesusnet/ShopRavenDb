@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace ShopRavenDb.Application;
+﻿namespace ShopRavenDb.Application;
 
 public class DocumentApplication : IDocumentApplication
 {
@@ -11,8 +9,13 @@ public class DocumentApplication : IDocumentApplication
         _documentService = documentService;
     }
 
-    public async Task<string> AttachDocument(string version, string description, IEnumerable<Build> builds, IFormFile file)
+    public async Task<string> AttachDocument(IFormFile file)
     {
-        return await _documentService.AttachDocument(version, description, builds, file).ConfigureAwait(false);
+        return await _documentService.AttachDocument(file).ConfigureAwait(false);
+    }
+
+    public async Task<AttachmentResult?> GetAttachDocument(string documentId)
+    {
+        return await _documentService.GetAttachDocument(documentId).ConfigureAwait(false);
     }
 }

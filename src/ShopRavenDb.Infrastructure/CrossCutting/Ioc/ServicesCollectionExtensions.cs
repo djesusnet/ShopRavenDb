@@ -25,9 +25,6 @@
             var mappingConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new DtoToModelMappingCustomer());
-                mc.AddProfile(new DtoToModelMappingAddress());
-                mc.AddProfile(new DtoToModelMappingVersioningFile());
-                mc.AddProfile(new DtoToModelMappingBuild());
             });
 
             IMapper mapper = mappingConfig.CreateMapper();
@@ -40,6 +37,7 @@
         {
             servicesCollection.TryAddScoped<ICustomerService, CustomerService>();
             servicesCollection.TryAddScoped<IDocumentService, DocumentService>();
+
             return servicesCollection;
         }
 
@@ -47,13 +45,15 @@
         {
             servicesCollection.TryAddScoped<ICustomerApplication, CustomerApplication>();
             servicesCollection.TryAddScoped<IDocumentApplication, DocumentApplication>();
+            
             return servicesCollection;
         }
 
         public static IServiceCollection AddRepositories(this IServiceCollection servicesCollection)
         {
             servicesCollection.TryAddSingleton<ICustomerRepository, CustomerRepository>();
-            servicesCollection.TryAddScoped<IDocumentRepository, DocumentRepository>();
+            servicesCollection.TryAddSingleton<IDocumentRepository, DocumentRepository>();
+
             return servicesCollection;
         }
     }

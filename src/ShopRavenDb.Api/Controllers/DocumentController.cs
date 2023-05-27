@@ -1,6 +1,4 @@
-﻿using ShopRavenDb.Domain.Model;
-
-namespace ShopRavenDb.Api.Controllers;
+﻿namespace ShopRavenDb.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -14,13 +12,27 @@ public class DocumentController : ControllerBase
     }
 
 
-    [HttpPost]
+    [HttpPost("attach", Name = "attach-document")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> AddAnnexDocument(IFormFile file, [FromQuery]string version, [FromQuery]string description, [FromQuery]IEnumerable<Build> builds )
+    public async Task<IActionResult> AttachDocument(IFormFile file)
     {
+       var result = await _documentApplication.AttachDocument(file).ConfigureAwait(false);
+       
+       return Ok(result);
+    }
+    
+    [HttpGet("attach/download", Name = "get-attach-document")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetAttachDocument(string documentId)
+    {
+        var formattedDocumentId = Uri.UnescapeDataString(documentId);
+        var attachment = await _documentApplication.GetAttachDocument(formattedDocumentId).ConfigureAwait(false);
+        
+        if (attachment is null)
+            return NotFound();
 
-        await _documentApplication.AttachDocument(version, description, builds, file).ConfigureAwait(false);
-        return Ok("Customer Inserted successfully!");
+        return File(attachment.Stream, attachment.Details.ContentType, attachment.Details.Name);
     }
 }

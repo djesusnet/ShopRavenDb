@@ -15,4 +15,9 @@
     <ProjectReference Include="..\ShopRavenDb.Domain\ShopRavenDb.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Mappers\DtoToModelMappingBuild.cs" />
+    <Compile Remove="Mappers\DtoToModelMappingVersioningFile.cs" />
+  </ItemGroup>
+
 </Project>

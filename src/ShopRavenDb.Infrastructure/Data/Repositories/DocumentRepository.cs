@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using ShopRavenDb.Infrastructure.CrossCutting.Extensions;
+using Raven.Client.Documents.Operations.Attachments;
 
 namespace ShopRavenDb.Infrastructure.Data.Repositories;
 
@@ -12,32 +12,36 @@ public class DocumentRepository : IDocumentRepository
         _documentStore = documentStore;
     }
 
-    public async Task<string> AttachDocument(string version, string description, IEnumerable<Build> builds, IFormFile file)
+    public async Task<string> AttachDocument(IFormFile file)
     {
-        VersioningFile? versioningFile = null;
-        
-        using (var session = _documentStore.OpenAsyncSession())
+        Document? document = null;
+
+        using var session = _documentStore.OpenAsyncSession();
+        document = await session.Query<Document>()
+                                .FirstOrDefaultAsync(d => d.Name == file.FileName).ConfigureAwait(false) ?? new Document()
         {
-            versioningFile = await session.Query<VersioningFile>()
-                .Where(d => d.Version == version)
-                .FirstOrDefaultAsync() ?? new VersioningFile()
-            {
-                CreateDate = DateTime.Now,
-                Name = file.FileName,
-                ContentType = file.ContentType,
-                Extension = Path.GetExtension(file.FileName),
-                Version = version,
-                Description = description,
-                CompressedContent = await file.OpenReadStream().CompressAsync(),
-                Builds = builds
-            };
-            
-            await session.StoreAsync(versioningFile);
-            using var stream = new MemoryStream(versioningFile.CompressedContent);
-            session.Advanced.Attachments.Store(versioningFile.Id, versioningFile.Name, stream, versioningFile.ContentType);
-            await session.SaveChangesAsync();
-        }
-    
-        return "Document successfully attached!";
+            CreateDate = DateTime.Now,
+            Name = file.FileName
+        };
+        await session.StoreAsync(document).ConfigureAwait(false);
+        await using var stream = file.OpenReadStream();
+        session.Advanced.Attachments.Store(document.Id, document.Name, stream, file.ContentType);
+        await session.SaveChangesAsync().ConfigureAwait(false);
+        
+        return "Document sucessfully attached !";
+    }
+
+    public async Task<AttachmentResult?> GetAttachDocument(string documentId)
+    {
+     
+        using var session = _documentStore.OpenAsyncSession();
+
+        var document = await session.LoadAsync<Document>(documentId).ConfigureAwait(false);
+
+        if (document is null) return null;
+        
+        var attachment = await session.Advanced.Attachments.GetAsync(document.Id, document.Name).ConfigureAwait(false);
+        return attachment;
+
     }
 }
