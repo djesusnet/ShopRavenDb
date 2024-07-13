@@ -1,4 +1,7 @@
-﻿namespace ShopRavenDb.Infrastructure.CrossCutting.Ioc
+﻿using ShopRavenDb.Domain.Core.Interfaces.Validators;
+using ShopRavenDb.Infrastructure.CrossCutting.Validators;
+
+namespace ShopRavenDb.Infrastructure.CrossCutting.Ioc
 {
     public static class ServicesCollectionExtensions
     {
@@ -54,6 +57,13 @@
             servicesCollection.TryAddSingleton<ICustomerRepository, CustomerRepository>();
             servicesCollection.TryAddSingleton<IDocumentRepository, DocumentRepository>();
 
+            return servicesCollection;
+        }
+
+        public static IServiceCollection AddValidators(this IServiceCollection servicesCollection)
+        {
+            servicesCollection.TryAddScoped<IEmailValidator, EmailValidator>();
+            
             return servicesCollection;
         }
     }

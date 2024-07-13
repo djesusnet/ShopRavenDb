@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-
-namespace ShopRavenDb.Api.Controllers
+﻿namespace ShopRavenDb.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

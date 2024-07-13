@@ -1,17 +1,26 @@
-﻿namespace ShopRavenDb.Domain.Services
+﻿using ShopRavenDb.Domain.Core.Interfaces.Validators;
+
+namespace ShopRavenDb.Domain.Services
 {
     public class CustomerService : ICustomerService
     {
         private readonly ICustomerRepository _customerRepository;
+        private readonly IEmailValidator _emailValidator;
 
-        public CustomerService(ICustomerRepository customerRepository)
+        public CustomerService(ICustomerRepository customerRepository,
+                               IEmailValidator emailValidator)
         {
             _customerRepository = customerRepository;
+            _emailValidator = emailValidator;
+
         }
 
         public void AddCustomer(Customer customer)
         {
-            customer.Address.IsActive = true;
+            if (!_emailValidator.IsValid(customer.Email))
+            {
+                throw new Exception("Invalid email");
+            }
             customer.IsActive = true;
             _customerRepository.AddCustomer(customer);
         }
